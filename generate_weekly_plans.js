@@ -3,6 +3,11 @@ const path = require('path');
 
 const OUT = path.join(__dirname, '周计划');
 if (!fs.existsSync(OUT)) fs.mkdirSync(OUT);
+for (const f of fs.readdirSync(OUT)) {
+  if (f.endsWith('.md')) {
+    try { fs.rmSync(path.join(OUT, f)); } catch (e) { console.warn('跳过（被占用）:', f); }
+  }
+}
 
 const WD = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 const p2 = (n) => String(n).padStart(2, '0');
@@ -12,9 +17,9 @@ const fmtShort = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
 function weekDays(i) {
   const days = [];
   let start, count;
-  if (i === 1) { start = new Date(2026, 8, 24); count = 4; }
+  if (i === 1) { start = new Date(2026, 9, 9); count = 3; }
   else {
-    start = new Date(2026, 8, 28);
+    start = new Date(2026, 9, 12);
     start.setDate(start.getDate() + (i - 2) * 7);
     count = 7;
   }
@@ -208,8 +213,7 @@ const TOPICS = { 5: P1, 27: P2, 53: P3, 79: P4, 131: P5 };
 
 const CUSTOM = {
   1: [
-    ['公司', '1h', '账号与仓库：注册 Epic / GitHub 账号；建 GitHub 私有仓 game-dev-plan 并把本计划文件夹推上去（若公司网络受限，用手机完成，公司机只做只读浏览）', '仓库地址记入 notes/'],
-    ['公司', '1h', '工作机：Visual Studio Installer 修改安装 → 确认勾选"使用 C++ 的桌面开发"；建控制台工程写第一个指针练习（cpp-exercises/001）；顺手浏览 Epic 官方文档《Your First Hour》', '练习可编译运行'],
+    ['公司', '1h', '账号与仓库：注册 Epic / GitHub 账号（公司网络受限就用手机完成）；建 GitHub 私有仓 game-dev-plan 并把本计划文件夹整体推上去；顺手浏览 Epic 官方文档《Your First Hour》', '仓库地址记入 notes/'],
     ['家用', '2–3h', '装机主战场：Epic Games Launcher → 安装 UE5 最新正式版；安装 VS2022 Community（C++ 桌面负载）；安装 Git 并执行 git config --global core.longpaths true；新建 First Person（C++）模板工程 → 右键生成 VS 项目文件', '引擎与工程都成功启动'],
     ['家用', '1–2h', '跑通 First Person 并在 BeginPlay 打断点调试（第一次 UE+C++ 联调体验）；新建 Lyra 工程浏览结构；写第一篇周复盘 weekly-review/week-001.md', '复盘笔记'],
   ],
@@ -293,7 +297,7 @@ function genWeek(i) {
 const rows = [];
 for (let i = 1; i <= 156; i++) rows.push(genWeek(i));
 
-let idx = `# 周计划索引（共 156 周：2026-09-24 ~ ${fmtFull(weekDays(156)[6])}）\n\n`;
+let idx = `# 周计划索引（共 156 周：${fmtFull(weekDays(1)[0])} ~ ${fmtFull(weekDays(156)[6])}）\n\n`;
 idx += `> 使用方法：打开当周文件，照表逐日执行；每周五与周日晚回答"复盘三问"并勾选验收。\n> 进度落后时不要跳周补课，直接在当周文件的行动格里微调；阶段性调整请修改 ../generate_weekly_plans.js 主题表后重新生成。\n\n`;
 for (const ph of PHASES) {
   idx += `## ${ph.name}（W${ph.start}–W${ph.start + ph.weeks - 1}）\n\n| 周 | 日期 | 本周 UE 线 |\n|---|---|---|\n`;
